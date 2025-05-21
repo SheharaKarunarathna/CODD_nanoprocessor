@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 05/16/2025 01:56:23 PM
+-- Create Date: 05/15/2025 02:27:47 PM
 -- Design Name: 
--- Module Name: Decoder_3_to_8 - Behavioral
+-- Module Name: Mux_8_to_1 - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -31,42 +31,36 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity Decoder_3_to_8 is
+entity Mux_8_to_1 is
+    Port ( Sel : in STD_LOGIC_VECTOR (2 downto 0);
+           D : in STD_LOGIC_VECTOR (7 downto 0);
+           Y : out STD_LOGIC);
+end Mux_8_to_1;
+
+architecture Behavioral of Mux_8_to_1 is
+    component Decoder_3_to_8
     Port ( I : in STD_LOGIC_VECTOR (2 downto 0);
            EN : in STD_LOGIC;
-           Y : out STD_LOGIC_VECTOR (7 downto 0));
-end Decoder_3_to_8;
-
-architecture Behavioral of Decoder_3_to_8 is
-    component Decoder_2_to_4
-    Port ( I : in STD_LOGIC_VECTOR (1 downto 0);
-               EN : in STD_LOGIC;
-               Y : out STD_LOGIC_VECTOR (3 downto 0));
+           Y : out STD_LOGIC_VECTOR (7 downto 0));    
     end component;
-    signal I0,I1:std_logic_vector(1 downto 0);
-    signal Y0,Y1:std_logic_vector(3 downto 0);
-    signal E0,E1,I2:std_logic;
-    
+    signal EN : STD_LOGIC:='1';
+    signal Y_Dec : STD_LOGIC_VECTOR (7 downto 0);
 begin
-    Decoder_2_4_0:Decoder_2_to_4
+    Decoder_3_to_8_0:Decoder_3_to_8
     port map(
-        I=>I0,
-        EN=>E0,
-        Y=>Y0
-    );
-    Decoder_2_4_1:Decoder_2_to_4
-    port map(
-        I=>I1,
-        EN=>E1,
-        Y=>Y1
+        I=>Sel,
+        EN=>EN,
+        Y=>Y_Dec
     );
     
-    E0<= not(I(2)) and EN;
-    I0<=I(1 downto 0);
-    Y(3 downto 0)<=Y0;
-    
-    E1<=I(2) and EN;
-    I1<=I(1 downto 0);
-    Y(7 downto 4)<=Y1;
-
+    Y<= EN and ( (D(0) and Y_Dec(0))
+              or (D(1) and Y_Dec(1))
+              or (D(2) and Y_Dec(2))
+              or (D(3) and Y_Dec(3))
+              or (D(4) and Y_Dec(4))
+              or (D(5) and Y_Dec(5))
+              or (D(6) and Y_Dec(6))
+              or (D(7) and Y_Dec(7)) );
+              
 end Behavioral;
+
